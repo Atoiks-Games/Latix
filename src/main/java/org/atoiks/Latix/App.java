@@ -1,4 +1,4 @@
-package org.atoiks.wchess;
+package org.atoiks.latix;
 
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;

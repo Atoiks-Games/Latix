@@ -1,4 +1,4 @@
-package org.atoiks.wchess;
+package org.atoiks.latix;
 
 public final class Board implements java.io.Serializable {
     private enum TileState {
