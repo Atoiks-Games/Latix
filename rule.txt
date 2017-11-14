@@ -1,0 +1,45 @@
+Game board
+
+  a b c d e f g h i
+1 +-+-+-+-o-+-+-+-+
+  | |\|/| | |\|/| |     Objects can only be placed on '+' or 'x'
+2 +-+-x-+-+-+-x-+-+     '+' tiles indicate the piece can only move
+  |\|/|\| | |/|\|/|        up, down, left, or right by one tile
+3 +-x-+-+-+-+-+-x-+     OR up, down by two tiles
+  |/|\| |\|/| |/|\|     'x' tiles indicate the piece can only move
+4 +-+-+-+-x-+-+-+-+        diagonally by any number of tiles
+  | | |       | | |
+5 +-+-+       +-+-+
+  | | |       | | |
+6 +-+-+-+-x-+-+-+-+
+  |\|/| |/|\| |\|/|
+7 +-x-+-+-+-+-+-x-+     'o' tiles are where a new piece is added to
+  |/|\|/| | |\|/|\|        existing pieces cannot move on nor
+8 +-+-x-+-+-+-x-+-+        through them
+  | |/|\| | |/|\| |
+9 +-+-+-+-o-+-+-+-+
+
+set up: (P2 for example)
+8 +-+-A-A-A-A-A-+-+     'A' indicates the pieces
+  | | | | | | | | |
+9 +-A-A-A-o-A-A-A-+
+
+winning condition:
+   Take all the pieces of the other player that are not located on the 'o' tile
+OR Block all posible movements of the other player
+OR If the opponent resigns
+
+rules:
+   Similar to chess, two colors, white side always starts first.
+   Again, the rounds alternate between the two players.
+   On each round, the player can choose to either get a new piece
+OR move two existing pieces
+   The movement restrictions for each piece are listed above
+   For taking another player's piece, it is done diagonally within
+   one tile distance.
+   Exception is that pieces on the 'x' tiles cannot take other
+   pieces, although a piece can be taken from the 'x' tile by
+   another piece as long as it was located on a '+' tile.
+
+   If the player chooses to get a new piece, the new piece is
+   added to the 'o' tile on the player's side
