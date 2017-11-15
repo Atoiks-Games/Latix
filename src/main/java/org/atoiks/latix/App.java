@@ -5,6 +5,11 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+
 import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -40,8 +45,9 @@ public class App {
     private int originX = 0;
     private int originY = 0;
 
-    private int p1RemSpawns = 5;
-    private int p2RemSpawns = 5;
+    // see initial value in update()
+    private int p1RemSpawns;
+    private int p2RemSpawns;
 
     public void run() {
         init();
@@ -68,6 +74,39 @@ public class App {
         if (window == NULL) {
             throw new RuntimeException("Failed to crete GLFW window");
         }
+
+	glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+	    if (action == GLFW_PRESS) {
+		switch (key) {
+		case GLFW_KEY_R:
+		    // mark state back to init (essentially a reset
+		    state = INITING;
+		    break;
+		case GLFW_KEY_S:
+		    System.err.print("saving game in latix.gamesave ");
+		    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("latix.gamesave"))) {
+			oos.writeObject(board);
+			oos.writeInt(p1RemSpawns);
+			oos.writeInt(p2RemSpawns);
+			System.err.println("[DONE]");
+		    } catch (java.io.IOException ex) {
+			System.err.println("[FAIL]");
+		    }
+		    break;
+		case GLFW_KEY_O:
+		    System.err.print("opening game from latix.gamesave ");
+		    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("latix.gamesave"))) {
+			board = (Board) ois.readObject();
+			p1RemSpawns = ois.readInt();
+			p2RemSpawns = ois.readInt();
+			System.err.println("[DONE]");
+		    } catch (java.io.IOException | ClassNotFoundException ex) {
+			System.err.println("[FAIL]");
+		    }
+		    break;
+		}
+	    }
+	});
 
         glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
             if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
@@ -99,15 +138,11 @@ public class App {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(GLFW_TRUE);
         glfwShowWindow(window);
-
-        board.reset();
     }
 
     private void loop() {
         GL.createCapabilities();
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
-        state = P1_TURN0 | WAIT_FLG;
 
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
@@ -119,10 +154,18 @@ public class App {
     }
 
     private void update() {
+	if (state == INITING) {
+	    board.reset();
+	    p1RemSpawns = p2RemSpawns = 5;
+	    
+	    state = P1_TURN0 | WAIT_FLG;
+	    return;
+	}
+	
         switch (board.getWinner()) {
             case 1:
             case 2:
-                glfwSetWindowShouldClose(window, true);
+		state = INITING; // game restarts
                 return;
         }
 

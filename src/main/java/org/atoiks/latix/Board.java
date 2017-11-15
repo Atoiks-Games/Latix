@@ -6,6 +6,7 @@ public final class Board implements java.io.Serializable {
     }
 
     private static final long serialVersionUID = 1279125383L;
+
     public static final int DIMENSION = 9;
     
     private final TileState[][] tiles;
