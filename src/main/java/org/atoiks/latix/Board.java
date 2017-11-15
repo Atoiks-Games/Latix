@@ -98,9 +98,6 @@ public final class Board implements java.io.Serializable {
 	// These do not include the ones on the 'o' tiles
 	int p1RemPieces = 0;
 	int p2RemPieces = 0;
-
-        boolean p1HasPossibleMoves = true;
-        boolean p2HasPossibleMoves = true;
 	
 	for (int y = 0; y < DIMENSION; ++y) {
 	    for (int x = 0; x < DIMENSION; ++x) {
@@ -108,27 +105,9 @@ public final class Board implements java.io.Serializable {
 		    switch (tiles[y][x]) {
 		    case P1_PIECE:
 			++p1RemPieces;
-			if (p1HasPossibleMoves) {
-			    final int[] tiles = getMovementOptions(x, y, 1);
-			    for (int i = tiles.length; i > 0; --i) {
-				if (tiles[i - 1] < 0) {
-				    p1HasPossibleMoves = false;
-				    break;
-				}
-			    }
-			}
 			break;
 		    case P2_PIECE:
 			++p2RemPieces;
-			if (p2HasPossibleMoves) {
-			    final int[] tiles = getMovementOptions(x, y, 2);
-			    for (int i = tiles.length; i > 0; --i) {
-				if (tiles[i - 1] < 0) {
-				    p2HasPossibleMoves = false;
-				    break;
-				}
-			    }
-			}
 			break;
 		    }
 		}
@@ -142,15 +121,7 @@ public final class Board implements java.io.Serializable {
 	if (p2RemPieces == 0) {
 	    return 1;
 	}
-
-	if (!p1HasPossibleMoves) {
-	    // check if p2 also has no more possible moves (draw)
-	    return p2HasPossibleMoves ? 2 : 0;
-	}
-	if (!p2HasPossibleMoves) {
-	    return 1;
-	}
-
+	
 	// anything but 0, 1, 2 will work
 	return -1;
     }

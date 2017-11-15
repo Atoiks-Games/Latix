@@ -40,6 +40,9 @@ public class App {
     private int originX = 0;
     private int originY = 0;
 
+    private int p1RemSpawns = 5;
+    private int p2RemSpawns = 5;
+
     public void run() {
         init();
         loop();
@@ -129,7 +132,9 @@ public class App {
                     originX = mouseVirtX;
                     originY = mouseVirtY;
                     state = P1_TURN1;
-		} else if (board.trySpawnP1At(mouseVirtX, mouseVirtY)) {
+		} else if (p1RemSpawns > 0
+			   && board.trySpawnP1At(mouseVirtX, mouseVirtY)) {
+		    p1RemSpawns--;
                     state = P2_TURN0;
                 }
                 state |= WAIT_FLG;
@@ -156,7 +161,9 @@ public class App {
                     originX = mouseVirtX;
                     originY = mouseVirtY;
                     state = P2_TURN1;
-		} else if (board.trySpawnP2At(mouseVirtX, mouseVirtY)) {
+		} else if (p2RemSpawns > 0
+			   && board.trySpawnP2At(mouseVirtX, mouseVirtY)) {
+		    p2RemSpawns--;
                     state = P1_TURN0;
                 }
                 state |= WAIT_FLG;
