@@ -46,6 +46,22 @@ public final class Board implements java.io.Serializable {
 	    }
 	}
     }
+    
+    public boolean trySpawnP1At(int x, int y) {
+	if (x == 4 && y == 0 && tiles[y][x] != TileState.P1_PIECE) {
+	    tiles[y][x] = TileState.P1_PIECE;
+	    return true;
+	}
+	return false;
+    }
+    
+    public boolean trySpawnP2At(int x, int y) {
+	if (x == 4 && y == 8 && tiles[y][x] != TileState.P2_PIECE) {
+	    tiles[y][x] = TileState.P2_PIECE;
+	    return true;
+	}
+	return false;
+    }
 
     public static boolean isRegularTile(int x, int y) {
 	// isNonPassableTile will handle out of bound coordinates
