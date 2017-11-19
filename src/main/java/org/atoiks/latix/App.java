@@ -52,6 +52,9 @@ public class App {
     private int p1RemSpawns;
     private int p2RemSpawns;
 
+    private int[] p1ValidMoves;
+    private int[] p2ValidMoves;
+
     private int vaoIdBoard;
     private int vboIdBoard;
 
@@ -280,6 +283,7 @@ public class App {
 	    if (board.hasP1Piece(mouseVirtX, mouseVirtY)) {
 		originX = mouseVirtX;
 		originY = mouseVirtY;
+		p1ValidMoves = board.getMovementOptions(originX, originY, 1);
 		state = P1_TURN1;
 	    } else if (p1RemSpawns > 0
 		       && board.trySpawnP1At(mouseVirtX, mouseVirtY)) {
@@ -294,10 +298,9 @@ public class App {
 		state = P1_TURN0 | WAIT_FLG;
 		return;
 	    }
-		
-	    final int[] validTiles = board.getMovementOptions(originX, originY, 1);
-	    for (int i = 0; i < validTiles.length; i += 2) {
-		if (mouseVirtX == validTiles[i] && mouseVirtY == validTiles[i + 1]) {
+
+	    for (int i = 0; i < p1ValidMoves.length; i += 2) {
+		if (mouseVirtX == p1ValidMoves[i] && mouseVirtY == p1ValidMoves[i + 1]) {
 		    logGame("P1 " + originX + "" + (char) ('a' + originY)
 			    + "-" + mouseVirtX + "" + (char) ('a' + mouseVirtY));
 		    board.bruteMove(originX, originY, mouseVirtX, mouseVirtY);
@@ -312,6 +315,7 @@ public class App {
 	    if (board.hasP2Piece(mouseVirtX, mouseVirtY)) {
 		originX = mouseVirtX;
 		originY = mouseVirtY;
+		p2ValidMoves = board.getMovementOptions(originX, originY, 2);
 		state = P2_TURN1;
 	    } else if (p2RemSpawns > 0
 		       && board.trySpawnP2At(mouseVirtX, mouseVirtY)) {
@@ -327,9 +331,8 @@ public class App {
 		return;
 	    }
 
-	    final int[] validTiles = board.getMovementOptions(originX, originY, 2);
-	    for (int i = 0; i < validTiles.length; i += 2) {
-		if (mouseVirtX == validTiles[i] && mouseVirtY == validTiles[i + 1]) {
+	    for (int i = 0; i < p2ValidMoves.length; i += 2) {
+		if (mouseVirtX == p2ValidMoves[i] && mouseVirtY == p2ValidMoves[i + 1]) {
 		    logGame("P2 " + originX + "" + (char) ('a' + originY)
 			    + "-" + mouseVirtX + "" + (char) ('a' + mouseVirtY));
 		    board.bruteMove(originX, originY, mouseVirtX, mouseVirtY);
@@ -361,6 +364,7 @@ public class App {
             float startY = -0.8f;
             // Draw the board bottom-up (board is top-down)
             for (int j = Board.DIMENSION - 1; j >= 0; --j) {
+		// Draw pieces
                 if (board.hasP1Piece(i, j)) {
                     if (originX == i && originY == j
 			&& (state & DEST_FLG) == DEST_FLG) {
@@ -384,6 +388,33 @@ public class App {
                     glVertex2f(startX + 0.075f, startY - 0.075f);
                     glVertex2f(startX + 0.075f, startY + 0.075f);
                 }
+
+		// Draw movement hints
+		if ((state & DEST_FLG) == DEST_FLG) {
+		    glColor4f(0.0f, 1.0f, 0.0f, 0.25f);
+
+		    if ((state & P1_FLG) == P1_FLG) {
+			for (int k = 0; k < p1ValidMoves.length; k += 2) {
+			    if (i == p1ValidMoves[k]
+				&& j == p1ValidMoves[k + 1]) {
+				glVertex2f(startX - 0.055f, startY + 0.055f);
+				glVertex2f(startX - 0.055f, startY - 0.055f);
+				glVertex2f(startX + 0.055f, startY - 0.055f);
+				glVertex2f(startX + 0.055f, startY + 0.055f);
+			    }
+			}
+		    } else {
+			for (int k = 0; k < p2ValidMoves.length; k += 2) {
+			    if (i == p2ValidMoves[k]
+				&& j == p2ValidMoves[k + 1]) {
+				glVertex2f(startX - 0.055f, startY + 0.055f);
+				glVertex2f(startX - 0.055f, startY - 0.055f);
+				glVertex2f(startX + 0.055f, startY - 0.055f);
+				glVertex2f(startX + 0.055f, startY + 0.055f);
+			    }
+			}
+		    }
+		}
                 startY += 0.2f;
             }
             startX += 0.2f;
