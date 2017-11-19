@@ -55,6 +55,8 @@ public class App {
     private int vaoIdBoard;
     private int vboIdBoard;
 
+    private long startTime;
+
     public void run() {
         init();
         loop();
@@ -119,31 +121,31 @@ public class App {
 	});
 
         glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
-            if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-                if ((state & WAIT_FLG) != WAIT_FLG) {
-                    return;
-                }
+	    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		if ((state & WAIT_FLG) != WAIT_FLG) {
+		    return;
+		}
 
-                try (MemoryStack stack = stackPush()) {
-                    final DoubleBuffer xptr = stack.mallocDouble(1);
-                    final DoubleBuffer yptr = stack.mallocDouble(1);
-                    glfwGetCursorPos(window, xptr, yptr);
+		try (MemoryStack stack = stackPush()) {
+		    final DoubleBuffer xptr = stack.mallocDouble(1);
+		    final DoubleBuffer yptr = stack.mallocDouble(1);
+		    glfwGetCursorPos(window, xptr, yptr);
 
-                    final double x = xptr.get(0);
-                    final double y = yptr.get(0);
-                    if (!(x <= 20 || x >= 280 || y <= 20 || y >= 280)) {
-                        mouseVirtX = Math.min((int) ((x - 20) / 28), Board.DIMENSION - 1);
-                        mouseVirtY = Math.min((int) ((y - 20) / 28), Board.DIMENSION - 1);
-                        state ^= WAIT_FLG;
-                    }
-                }
-            }
-        });
+		    final double x = xptr.get(0);
+		    final double y = yptr.get(0);
+		    if (!(x <= 20 || x >= 280 || y <= 20 || y >= 280)) {
+			mouseVirtX = Math.min((int) ((x - 20) / 28), Board.DIMENSION - 1);
+			mouseVirtY = Math.min((int) ((y - 20) / 28), Board.DIMENSION - 1);
+			state ^= WAIT_FLG;
+		    }
+		}
+	    }
+	});
 
         final GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(window,
-                (vidmode.width() - WIDTH) / 2,
-                (vidmode.height() - HEIGHT) / 2);
+			 (vidmode.width() - WIDTH) / 2,
+			 (vidmode.height() - HEIGHT) / 2);
 
         glfwMakeContextCurrent(window);
         glfwSwapInterval(GLFW_TRUE);
@@ -167,171 +169,178 @@ public class App {
 	if (state == INITING) {
 	    board.reset();
 	    p1RemSpawns = p2RemSpawns = 5;
+	    startTime = System.currentTimeMillis();
 	    
-         // Populate vboIdBoard
-         try (MemoryStack stack = stackPush()) {
-             final FloatBuffer buf = stack.mallocFloat(136);
-            // Horizontal lines
-            buf.put(-0.8f).put(0.8f);
-            buf.put(0.8f).put(0.8f);
-            buf.put(-0.8f).put(0.6f);
-            buf.put(0.8f).put(0.6f);
-            buf.put(-0.8f).put(0.4f);
-            buf.put(0.8f).put(0.4f);
-            buf.put(-0.8f).put(0.2f);
-            buf.put(0.8f).put(0.2f);
-            buf.put(-0.8f).put(0.0f);
-            buf.put(-0.4f).put(0.0f);
-            buf.put(0.4f).put(0.0f);
-            buf.put(0.8f).put(0.0f);
-            buf.put(-0.8f).put(-0.2f);
-            buf.put(0.8f).put(-0.2f);
-            buf.put(-0.8f).put(-0.4f);
-            buf.put(0.8f).put(-0.4f);
-            buf.put(-0.8f).put(-0.6f);
-            buf.put(0.8f).put(-0.6f);
-            buf.put(-0.8f).put(-0.8f);
-            buf.put(0.8f).put(-0.8f);
+	    // Populate vboIdBoard
+	    try (MemoryStack stack = stackPush()) {
+		final FloatBuffer buf = stack.mallocFloat(136);
+		// Horizontal lines
+		buf.put(-0.8f).put(0.8f);
+		buf.put(0.8f).put(0.8f);
+		buf.put(-0.8f).put(0.6f);
+		buf.put(0.8f).put(0.6f);
+		buf.put(-0.8f).put(0.4f);
+		buf.put(0.8f).put(0.4f);
+		buf.put(-0.8f).put(0.2f);
+		buf.put(0.8f).put(0.2f);
+		buf.put(-0.8f).put(0.0f);
+		buf.put(-0.4f).put(0.0f);
+		buf.put(0.4f).put(0.0f);
+		buf.put(0.8f).put(0.0f);
+		buf.put(-0.8f).put(-0.2f);
+		buf.put(0.8f).put(-0.2f);
+		buf.put(-0.8f).put(-0.4f);
+		buf.put(0.8f).put(-0.4f);
+		buf.put(-0.8f).put(-0.6f);
+		buf.put(0.8f).put(-0.6f);
+		buf.put(-0.8f).put(-0.8f);
+		buf.put(0.8f).put(-0.8f);
 
-            // Vertical lines
-            buf.put(-0.8f).put(-0.8f);
-            buf.put(-0.8f).put(0.8f);
-            buf.put(-0.6f).put(-0.8f);
-            buf.put(-0.6f).put(0.8f);
-            buf.put(-0.4f).put(-0.8f);
-            buf.put(-0.4f).put(0.8f);
-            buf.put(-0.2f).put(-0.8f);
-            buf.put(-0.2f).put(-0.2f);
-            buf.put(-0.2f).put(0.2f);
-            buf.put(-0.2f).put(0.8f);
-            buf.put(0.0f).put(-0.8f);
-            buf.put(0.0f).put(-0.2f);
-            buf.put(0.0f).put(0.2f);
-            buf.put(0.0f).put(0.8f);
-            buf.put(0.2f).put(-0.8f);
-            buf.put(0.2f).put(-0.2f);
-            buf.put(0.2f).put(0.2f);
-            buf.put(0.2f).put(0.8f);
-            buf.put(0.4f).put(-0.8f);
-            buf.put(0.4f).put(0.8f);
-            buf.put(0.6f).put(-0.8f);
-            buf.put(0.6f).put(0.8f);
-            buf.put(0.8f).put(-0.8f);
-            buf.put(0.8f).put(0.8f);
+		// Vertical lines
+		buf.put(-0.8f).put(-0.8f);
+		buf.put(-0.8f).put(0.8f);
+		buf.put(-0.6f).put(-0.8f);
+		buf.put(-0.6f).put(0.8f);
+		buf.put(-0.4f).put(-0.8f);
+		buf.put(-0.4f).put(0.8f);
+		buf.put(-0.2f).put(-0.8f);
+		buf.put(-0.2f).put(-0.2f);
+		buf.put(-0.2f).put(0.2f);
+		buf.put(-0.2f).put(0.8f);
+		buf.put(0.0f).put(-0.8f);
+		buf.put(0.0f).put(-0.2f);
+		buf.put(0.0f).put(0.2f);
+		buf.put(0.0f).put(0.8f);
+		buf.put(0.2f).put(-0.8f);
+		buf.put(0.2f).put(-0.2f);
+		buf.put(0.2f).put(0.2f);
+		buf.put(0.2f).put(0.8f);
+		buf.put(0.4f).put(-0.8f);
+		buf.put(0.4f).put(0.8f);
+		buf.put(0.6f).put(-0.8f);
+		buf.put(0.6f).put(0.8f);
+		buf.put(0.8f).put(-0.8f);
+		buf.put(0.8f).put(0.8f);
 
-            // Diagonal lines
-            buf.put(-0.8f).put(-0.6f);
-            buf.put(-0.4f).put(-0.2f);
-            buf.put(-0.6f).put(-0.8f);
-            buf.put(0.0f).put(-0.2f);
-            buf.put(0.2f).put(-0.8f);
-            buf.put(0.8f).put(-0.2f);
+		// Diagonal lines
+		buf.put(-0.8f).put(-0.6f);
+		buf.put(-0.4f).put(-0.2f);
+		buf.put(-0.6f).put(-0.8f);
+		buf.put(0.0f).put(-0.2f);
+		buf.put(0.2f).put(-0.8f);
+		buf.put(0.8f).put(-0.2f);
 
-            buf.put(0.8f).put(-0.6f);
-            buf.put(0.4f).put(-0.2f);
-            buf.put(0.6f).put(-0.8f);
-            buf.put(0.0f).put(-0.2f);
-            buf.put(-0.2f).put(-0.8f);
-            buf.put(-0.8f).put(-0.2f);
+		buf.put(0.8f).put(-0.6f);
+		buf.put(0.4f).put(-0.2f);
+		buf.put(0.6f).put(-0.8f);
+		buf.put(0.0f).put(-0.2f);
+		buf.put(-0.2f).put(-0.8f);
+		buf.put(-0.8f).put(-0.2f);
 
-            buf.put(-0.8f).put(0.6f);
-            buf.put(-0.4f).put(0.2f);
-            buf.put(-0.6f).put(0.8f);
-            buf.put(0.0f).put(0.2f);
-            buf.put(0.2f).put(0.8f);
-            buf.put(0.8f).put(0.2f);
+		buf.put(-0.8f).put(0.6f);
+		buf.put(-0.4f).put(0.2f);
+		buf.put(-0.6f).put(0.8f);
+		buf.put(0.0f).put(0.2f);
+		buf.put(0.2f).put(0.8f);
+		buf.put(0.8f).put(0.2f);
 
-            buf.put(0.8f).put(0.6f);
-            buf.put(0.4f).put(0.2f);
-            buf.put(0.6f).put(0.8f);
-            buf.put(0.0f).put(0.2f);
-            buf.put(-0.2f).put(0.8f);
-            buf.put(-0.8f).put(0.2f);
-             buf.flip();
+		buf.put(0.8f).put(0.6f);
+		buf.put(0.4f).put(0.2f);
+		buf.put(0.6f).put(0.8f);
+		buf.put(0.0f).put(0.2f);
+		buf.put(-0.2f).put(0.8f);
+		buf.put(-0.8f).put(0.2f);
+		buf.flip();
 
-             vaoIdBoard = glGenVertexArrays();
-             glBindVertexArray(vaoIdBoard);
+		vaoIdBoard = glGenVertexArrays();
+		glBindVertexArray(vaoIdBoard);
 
-             vboIdBoard = glGenBuffers();
-             glBindBuffer(GL_ARRAY_BUFFER, vboIdBoard);
-             glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
-             glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+		vboIdBoard = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, vboIdBoard);
+		glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
 
-             glBindBuffer(GL_ARRAY_BUFFER, 0);
-             glBindVertexArray(0);
-         }
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	    }
 
 	    state = P1_TURN0 | WAIT_FLG;
 	    return;
 	}
 	
         switch (board.getWinner()) {
-            case 1:
-            case 2:
-		state = INITING; // game restarts
-                return;
+	case 1:
+	case 2:
+	    state = INITING; // game restarts
+	    return;
         }
 
         switch (state) {
-            case P1_TURN0:
-                if (board.hasP1Piece(mouseVirtX, mouseVirtY)) {
-                    originX = mouseVirtX;
-                    originY = mouseVirtY;
-                    state = P1_TURN1;
-		} else if (p1RemSpawns > 0
-			   && board.trySpawnP1At(mouseVirtX, mouseVirtY)) {
-		    p1RemSpawns--;
-                    state = P2_TURN0;
-                }
-                state |= WAIT_FLG;
-                return;
-            case P1_TURN1: {
-		if (originX == mouseVirtX && originY == mouseVirtY) {
-		    state = P1_TURN0 | WAIT_FLG;
-		    return;
-		}
+	case P1_TURN0:
+	    if (board.hasP1Piece(mouseVirtX, mouseVirtY)) {
+		originX = mouseVirtX;
+		originY = mouseVirtY;
+		state = P1_TURN1;
+	    } else if (p1RemSpawns > 0
+		       && board.trySpawnP1At(mouseVirtX, mouseVirtY)) {
+		logGame("P1 spawn");
+		p1RemSpawns--;
+		state = P2_TURN0;
+	    }
+	    state |= WAIT_FLG;
+	    return;
+	case P1_TURN1: {
+	    if (originX == mouseVirtX && originY == mouseVirtY) {
+		state = P1_TURN0 | WAIT_FLG;
+		return;
+	    }
 		
-                final int[] validTiles = board.getMovementOptions(originX, originY, 1);
-                for (int i = 0; i < validTiles.length; i += 2) {
-                    if (mouseVirtX == validTiles[i] && mouseVirtY == validTiles[i + 1]) {
-                        board.bruteMove(originX, originY, mouseVirtX, mouseVirtY);
-                        state = P2_TURN0 | WAIT_FLG;
-                        return;
-                    }
-                }
-                state |= WAIT_FLG;
-                return;
-            }
-            case P2_TURN0:
-                if (board.hasP2Piece(mouseVirtX, mouseVirtY)) {
-                    originX = mouseVirtX;
-                    originY = mouseVirtY;
-                    state = P2_TURN1;
-		} else if (p2RemSpawns > 0
-			   && board.trySpawnP2At(mouseVirtX, mouseVirtY)) {
-		    p2RemSpawns--;
-                    state = P1_TURN0;
-                }
-                state |= WAIT_FLG;
-                return;
-            case P2_TURN1: {
-		if (originX == mouseVirtX && originY == mouseVirtY) {
+	    final int[] validTiles = board.getMovementOptions(originX, originY, 1);
+	    for (int i = 0; i < validTiles.length; i += 2) {
+		if (mouseVirtX == validTiles[i] && mouseVirtY == validTiles[i + 1]) {
+		    logGame("P1 " + originX + "" + (char) ('a' + originY)
+			    + "-" + mouseVirtX + "" + (char) ('a' + mouseVirtY));
+		    board.bruteMove(originX, originY, mouseVirtX, mouseVirtY);
 		    state = P2_TURN0 | WAIT_FLG;
 		    return;
 		}
+	    }
+	    state |= WAIT_FLG;
+	    return;
+	}
+	case P2_TURN0:
+	    if (board.hasP2Piece(mouseVirtX, mouseVirtY)) {
+		originX = mouseVirtX;
+		originY = mouseVirtY;
+		state = P2_TURN1;
+	    } else if (p2RemSpawns > 0
+		       && board.trySpawnP2At(mouseVirtX, mouseVirtY)) {
+		logGame("P2 spawn");
+		p2RemSpawns--;
+		state = P1_TURN0;
+	    }
+	    state |= WAIT_FLG;
+	    return;
+	case P2_TURN1: {
+	    if (originX == mouseVirtX && originY == mouseVirtY) {
+		state = P2_TURN0 | WAIT_FLG;
+		return;
+	    }
 
-                final int[] validTiles = board.getMovementOptions(originX, originY, 2);
-                for (int i = 0; i < validTiles.length; i += 2) {
-                    if (mouseVirtX == validTiles[i] && mouseVirtY == validTiles[i + 1]) {
-                        board.bruteMove(originX, originY, mouseVirtX, mouseVirtY);
-                        state = P1_TURN0 | WAIT_FLG;
-                        return;
-                    }
-                }
+	    final int[] validTiles = board.getMovementOptions(originX, originY, 2);
+	    for (int i = 0; i < validTiles.length; i += 2) {
+		if (mouseVirtX == validTiles[i] && mouseVirtY == validTiles[i + 1]) {
+		    logGame("P2 " + originX + "" + (char) ('a' + originY)
+			    + "-" + mouseVirtX + "" + (char) ('a' + mouseVirtY));
+		    board.bruteMove(originX, originY, mouseVirtX, mouseVirtY);
+		    state = P1_TURN0 | WAIT_FLG;
+		    return;
+		}
+	    }
 
-                state |= WAIT_FLG;
-                return;
-            }
+	    state |= WAIT_FLG;
+	    return;
+	}
         }
     }
 
@@ -354,7 +363,7 @@ public class App {
             for (int j = Board.DIMENSION - 1; j >= 0; --j) {
                 if (board.hasP1Piece(i, j)) {
                     if (originX == i && originY == j
-                            && (state & DEST_FLG) == DEST_FLG) {
+			&& (state & DEST_FLG) == DEST_FLG) {
                         glColor4f(1.0f, 0.0f, 0.0f, 0.25f);
                     } else {
                         glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
@@ -365,7 +374,7 @@ public class App {
                     glVertex2f(startX + 0.075f, startY + 0.075f);
                 } else if (board.hasP2Piece(i, j)) {
                     if (originX == i && originY == j
-                            && (state & DEST_FLG) == DEST_FLG) {
+			&& (state & DEST_FLG) == DEST_FLG) {
                         glColor4f(0.0f, 0.5f, 1.0f, 0.25f);
                     } else {
                         glColor4f(0.0f, 0.5f, 1.0f, 1.0f);
@@ -391,6 +400,11 @@ public class App {
 
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoIdBoard);
+    }
+
+    private void logGame(String msg) {
+	System.err.println("AT " + (System.currentTimeMillis() - startTime) / 1000
+			   + "s\t" + msg);
     }
 
     public static void main(String[] args) {
