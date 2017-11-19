@@ -78,6 +78,9 @@ public class App {
 	glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
 	    if (action == GLFW_PRESS) {
 		switch (key) {
+		case GLFW_KEY_Q:
+		    glfwSetWindowShouldClose(window, true);
+		    break;
 		case GLFW_KEY_R:
 		    // mark state back to init (essentially a reset
 		    state = INITING;
