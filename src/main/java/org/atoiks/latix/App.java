@@ -15,6 +15,9 @@ import java.nio.*;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -49,9 +52,13 @@ public class App {
     private int p1RemSpawns;
     private int p2RemSpawns;
 
+    private int vaoIdBoard;
+    private int vboIdBoard;
+
     public void run() {
         init();
         loop();
+        destroy();
 
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
@@ -161,6 +168,99 @@ public class App {
 	    board.reset();
 	    p1RemSpawns = p2RemSpawns = 5;
 	    
+         // Populate vboIdBoard
+         try (MemoryStack stack = stackPush()) {
+             final FloatBuffer buf = stack.mallocFloat(136);
+            // Horizontal lines
+            buf.put(-0.8f).put(0.8f);
+            buf.put(0.8f).put(0.8f);
+            buf.put(-0.8f).put(0.6f);
+            buf.put(0.8f).put(0.6f);
+            buf.put(-0.8f).put(0.4f);
+            buf.put(0.8f).put(0.4f);
+            buf.put(-0.8f).put(0.2f);
+            buf.put(0.8f).put(0.2f);
+            buf.put(-0.8f).put(0.0f);
+            buf.put(-0.4f).put(0.0f);
+            buf.put(0.4f).put(0.0f);
+            buf.put(0.8f).put(0.0f);
+            buf.put(-0.8f).put(-0.2f);
+            buf.put(0.8f).put(-0.2f);
+            buf.put(-0.8f).put(-0.4f);
+            buf.put(0.8f).put(-0.4f);
+            buf.put(-0.8f).put(-0.6f);
+            buf.put(0.8f).put(-0.6f);
+            buf.put(-0.8f).put(-0.8f);
+            buf.put(0.8f).put(-0.8f);
+
+            // Vertical lines
+            buf.put(-0.8f).put(-0.8f);
+            buf.put(-0.8f).put(0.8f);
+            buf.put(-0.6f).put(-0.8f);
+            buf.put(-0.6f).put(0.8f);
+            buf.put(-0.4f).put(-0.8f);
+            buf.put(-0.4f).put(0.8f);
+            buf.put(-0.2f).put(-0.8f);
+            buf.put(-0.2f).put(-0.2f);
+            buf.put(-0.2f).put(0.2f);
+            buf.put(-0.2f).put(0.8f);
+            buf.put(0.0f).put(-0.8f);
+            buf.put(0.0f).put(-0.2f);
+            buf.put(0.0f).put(0.2f);
+            buf.put(0.0f).put(0.8f);
+            buf.put(0.2f).put(-0.8f);
+            buf.put(0.2f).put(-0.2f);
+            buf.put(0.2f).put(0.2f);
+            buf.put(0.2f).put(0.8f);
+            buf.put(0.4f).put(-0.8f);
+            buf.put(0.4f).put(0.8f);
+            buf.put(0.6f).put(-0.8f);
+            buf.put(0.6f).put(0.8f);
+            buf.put(0.8f).put(-0.8f);
+            buf.put(0.8f).put(0.8f);
+
+            // Diagonal lines
+            buf.put(-0.8f).put(-0.6f);
+            buf.put(-0.4f).put(-0.2f);
+            buf.put(-0.6f).put(-0.8f);
+            buf.put(0.0f).put(-0.2f);
+            buf.put(0.2f).put(-0.8f);
+            buf.put(0.8f).put(-0.2f);
+
+            buf.put(0.8f).put(-0.6f);
+            buf.put(0.4f).put(-0.2f);
+            buf.put(0.6f).put(-0.8f);
+            buf.put(0.0f).put(-0.2f);
+            buf.put(-0.2f).put(-0.8f);
+            buf.put(-0.8f).put(-0.2f);
+
+            buf.put(-0.8f).put(0.6f);
+            buf.put(-0.4f).put(0.2f);
+            buf.put(-0.6f).put(0.8f);
+            buf.put(0.0f).put(0.2f);
+            buf.put(0.2f).put(0.8f);
+            buf.put(0.8f).put(0.2f);
+
+            buf.put(0.8f).put(0.6f);
+            buf.put(0.4f).put(0.2f);
+            buf.put(0.6f).put(0.8f);
+            buf.put(0.0f).put(0.2f);
+            buf.put(-0.2f).put(0.8f);
+            buf.put(-0.8f).put(0.2f);
+             buf.flip();
+
+             vaoIdBoard = glGenVertexArrays();
+             glBindVertexArray(vaoIdBoard);
+
+             vboIdBoard = glGenBuffers();
+             glBindBuffer(GL_ARRAY_BUFFER, vboIdBoard);
+             glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+             glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+
+             glBindBuffer(GL_ARRAY_BUFFER, 0);
+             glBindVertexArray(0);
+         }
+
 	    state = P1_TURN0 | WAIT_FLG;
 	    return;
 	}
@@ -237,86 +337,12 @@ public class App {
 
     private void render() {
         glColor3f(0.5f, 0.5f, 0.5f);
-        glBegin(GL_LINES);
-        {
-            // Horizontal lines
-            glVertex2f(-0.8f, 0.8f);
-            glVertex2f(0.8f, 0.8f);
-            glVertex2f(-0.8f, 0.6f);
-            glVertex2f(0.8f, 0.6f);
-            glVertex2f(-0.8f, 0.4f);
-            glVertex2f(0.8f, 0.4f);
-            glVertex2f(-0.8f, 0.2f);
-            glVertex2f(0.8f, 0.2f);
-            glVertex2f(-0.8f, 0.0f);
-            glVertex2f(-0.4f, 0.0f);
-            glVertex2f(0.4f, 0.0f);
-            glVertex2f(0.8f, 0.0f);
-            glVertex2f(-0.8f, -0.2f);
-            glVertex2f(0.8f, -0.2f);
-            glVertex2f(-0.8f, -0.4f);
-            glVertex2f(0.8f, -0.4f);
-            glVertex2f(-0.8f, -0.6f);
-            glVertex2f(0.8f, -0.6f);
-            glVertex2f(-0.8f, -0.8f);
-            glVertex2f(0.8f, -0.8f);
+        glBindVertexArray(vaoIdBoard);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_LINES, 0, 68);
 
-            // Vertical lines
-            glVertex2f(-0.8f, -0.8f);
-            glVertex2f(-0.8f, 0.8f);
-            glVertex2f(-0.6f, -0.8f);
-            glVertex2f(-0.6f, 0.8f);
-            glVertex2f(-0.4f, -0.8f);
-            glVertex2f(-0.4f, 0.8f);
-            glVertex2f(-0.2f, -0.8f);
-            glVertex2f(-0.2f, -0.2f);
-            glVertex2f(-0.2f, 0.2f);
-            glVertex2f(-0.2f, 0.8f);
-            glVertex2f(0.0f, -0.8f);
-            glVertex2f(0.0f, -0.2f);
-            glVertex2f(0.0f, 0.2f);
-            glVertex2f(0.0f, 0.8f);
-            glVertex2f(0.2f, -0.8f);
-            glVertex2f(0.2f, -0.2f);
-            glVertex2f(0.2f, 0.2f);
-            glVertex2f(0.2f, 0.8f);
-            glVertex2f(0.4f, -0.8f);
-            glVertex2f(0.4f, 0.8f);
-            glVertex2f(0.6f, -0.8f);
-            glVertex2f(0.6f, 0.8f);
-            glVertex2f(0.8f, -0.8f);
-            glVertex2f(0.8f, 0.8f);
-
-            // Diagonal lines
-            glVertex2f(-0.8f, -0.6f);
-            glVertex2f(-0.4f, -0.2f);
-            glVertex2f(-0.6f, -0.8f);
-            glVertex2f(0.0f, -0.2f);
-            glVertex2f(0.2f, -0.8f);
-            glVertex2f(0.8f, -0.2f);
-
-            glVertex2f(0.8f, -0.6f);
-            glVertex2f(0.4f, -0.2f);
-            glVertex2f(0.6f, -0.8f);
-            glVertex2f(0.0f, -0.2f);
-            glVertex2f(-0.2f, -0.8f);
-            glVertex2f(-0.8f, -0.2f);
-
-            glVertex2f(-0.8f, 0.6f);
-            glVertex2f(-0.4f, 0.2f);
-            glVertex2f(-0.6f, 0.8f);
-            glVertex2f(0.0f, 0.2f);
-            glVertex2f(0.2f, 0.8f);
-            glVertex2f(0.8f, 0.2f);
-
-            glVertex2f(0.8f, 0.6f);
-            glVertex2f(0.4f, 0.2f);
-            glVertex2f(0.6f, 0.8f);
-            glVertex2f(0.0f, 0.2f);
-            glVertex2f(-0.2f, 0.8f);
-            glVertex2f(-0.8f, 0.2f);
-        }
-        glEnd();
+        glDisableVertexAttribArray(0);
+        glBindVertexArray(0);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -355,6 +381,16 @@ public class App {
         }
         glEnd();
         glDisable(GL_BLEND);
+    }
+
+    private void destroy() {
+        glDisableVertexAttribArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glDeleteBuffers(vboIdBoard);
+
+        glBindVertexArray(0);
+        glDeleteVertexArrays(vaoIdBoard);
     }
 
     public static void main(String[] args) {
