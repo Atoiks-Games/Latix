@@ -16,6 +16,10 @@ switch (OperatingSystem.current()) {
 }
 
 project.ext.lwjglVersion = "3.1.3"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 mainClassName = 'org.atoiks.latix.App'
 
 repositories {
