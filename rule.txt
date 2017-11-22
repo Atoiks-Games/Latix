@@ -2,44 +2,38 @@ Game board
 
   a b c d e f g h i
 1 +-+-+-+-o-+-+-+-+
-  | |\|/| | |\|/| |     Objects can only be placed on '+' or 'x'
-2 +-+-x-+-+-+-x-+-+     '+' tiles indicate the piece can only move
-  |\|/|\| | |/|\|/|        up, down, left, or right by one tile
-3 +-x-+-+-+-+-+-x-+     OR up, down by two tiles
-  |/|\| |\|/| |/|\|     'x' tiles indicate the piece can only move
-4 +-+-+-+-x-+-+-+-+        diagonally by any number of tiles
+  | |\|/| | |\|/| |     Pieces occupy the x and + spaces of the board.
+2 +-+-x-+-+-+-x-+-+     Pieces can move along the lines between the tiles (with some limitations).
+  |\|/|\| | |/|\|/|     When you click on a piece, the possible moves are displayed with green squares.
+3 +-x-+-+-+-+-+-x-+     If you want to unselect a piece, click on it again.
+  |/|\| |\|/| |/|\|     When it is your turn you may either move or spawn.
+4 +-+-+-+-x-+-+-+-+     To move, click on a piece of your colour and then click on a valid square to move to.
   | | |       | | |
 5 +-+-+       +-+-+
   | | |       | | |
 6 +-+-+-+-x-+-+-+-+
   |\|/| |/|\| |\|/|
-7 +-x-+-+-+-+-+-x-+     'o' tiles are where a new piece is added to
-  |/|\|/| | |\|/|\|        existing pieces cannot move on nor
-8 +-+-x-+-+-+-x-+-+        through them
-  | |/|\| | |/|\| |
+7 +-x-+-+-+-+-+-x-+     O tiles are where a new piece is added to the game.
+  |/|\|/| | |\|/|\|     Click on the tile of your side during your turn to spawn a new piece.
+8 +-+-x-+-+-+-x-+-+     Existing pieces cannot move on to an O tile.
+  | |/|\| | |/|\| |     Each player can only spawn 5 times per match.
 9 +-+-+-+-o-+-+-+-+
 
 set up: (P2 for example)
-8 +-+-A-A-A-A-A-+-+     'A' indicates the pieces
+8 +-+-A-A-A-A-A-+-+     'A' indicates the pieces. This is how your pieces are set up at the beginning of the game.
   | | | | | | | | |
 9 +-A-A-A-o-A-A-A-+
 
-winning condition:
-   Take all the pieces of the other player that are not located on the 'o' tile
-OR Block all posible movements of the other player
-OR If the opponent resigns
+Winning condition:
+Take all the pieces of the other player that are not located on the 'o' tile or if the opponent resigns (AKA rage quit).
 
-rules:
-   Similar to chess, two colors, white side always starts first.
-   Again, the rounds alternate between the two players.
-   On each round, the player can choose to either get a new piece
-OR move two existing pieces
-   The movement restrictions for each piece are listed above
-   For taking another player's piece, it is done diagonally within
-   one tile distance.
-   Exception is that pieces on the 'x' tiles cannot take other
-   pieces, although a piece can be taken from the 'x' tile by
-   another piece as long as it was located on a '+' tile.
+Rules:
+   Similar to chess, two colors, red side always starts first.
+   The rounds alternate between the two players.
+   On each round, the player can choose to either get a new piece or move an exsisting piece.
+   The movement restrictions for each piece are shown with green markers.
 
-   If the player chooses to get a new piece, the new piece is
-   added to the 'o' tile on the player's side
+   If the player chooses to get a new piece, the new piece is added to the 'o' tile on the player's side.
+   You can do this a maximum of five times.
+
+   If you want to save a game, press S on your keyboard. To open a game press O on your keyboard. Press R to reset.
