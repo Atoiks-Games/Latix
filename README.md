@@ -9,8 +9,11 @@ Get jdk 8 or above, then run `gradlew run`
 ## Toggle Switches
 
 `r` - To restart
+
 `s` - To save
+
 `o` - To open a previous gamesave
+
 `q` - To quit
 
 ## Game Board
